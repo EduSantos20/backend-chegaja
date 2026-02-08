@@ -2,14 +2,17 @@ package com.edusantos.backend_chegaja.controller;
 
 import com.edusantos.backend_chegaja.dto.AddressResponse;
 import com.edusantos.backend_chegaja.entity.Address;
+import com.edusantos.backend_chegaja.entity.User;
 import com.edusantos.backend_chegaja.exception.ResourceNotFoundException;
 import com.edusantos.backend_chegaja.service.AddressService;
+import com.edusantos.backend_chegaja.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
@@ -22,7 +25,7 @@ public class AddressController {
     // Criar endereço para o usuário
     @PostMapping("/{userId}")
     public ResponseEntity<Address> create(
-            @PathVariable Long userId,
+            @PathVariable UUID userId,
             @RequestBody Address address
     ) {
         Address created = addressService.create(userId, address);
@@ -31,7 +34,7 @@ public class AddressController {
 
     // Listar endereços do usuário
     @GetMapping("/users/{userId}")
-    public ResponseEntity<List<AddressResponse>> listByUser(@PathVariable Long userId) {
+    public ResponseEntity<List<AddressResponse>> listByUser(@PathVariable UUID userId) {
         List<Address> addresses = addressService.listByUser(userId);
         List<AddressResponse> response = addresses.stream()
                 .map(addressService::toResponse)
@@ -41,7 +44,7 @@ public class AddressController {
 
     // Buscar endereço principal
     @GetMapping("/users/{userId}/principal")
-    public ResponseEntity<AddressResponse> getPrincipalAddress(@PathVariable Long userId) {
+    public ResponseEntity<AddressResponse> getPrincipalAddress(@PathVariable UUID userId) {
         Address principal = addressService.getPrincipal(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Endereço principal não encontrado"));
         return ResponseEntity.ok(addressService.toResponse(principal));
@@ -50,8 +53,8 @@ public class AddressController {
     // Deletar endereço
     @DeleteMapping("/users/{userId}/{addressId}")
     public ResponseEntity<Void> delete(
-            @PathVariable Long userId,
-            @PathVariable Long addressId
+            @PathVariable UUID userId,
+            @PathVariable UUID addressId
     ) {
         addressService.delete(userId, addressId);
         return ResponseEntity.noContent().build();

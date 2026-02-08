@@ -5,7 +5,6 @@ import com.edusantos.backend_chegaja.entity.User;
 import com.edusantos.backend_chegaja.exception.ResourceAlreadyExistsException;
 import com.edusantos.backend_chegaja.repository.UserRepository;
 import com.edusantos.backend_chegaja.security.JwtUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -15,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -36,12 +36,14 @@ public class AuthService {
         this.jwtUtils = jwtUtils;
     }
 
+    // Método para registro de usuário
     @Transactional
     public AuthDTO.AuthResponse register(AuthDTO.RegisterRequest registerRequest) {
         if (userRepository.existsByEmail(registerRequest.getEmail())) {
             throw new ResourceAlreadyExistsException("Email já está em uso!");
         }
 
+        // Criar usuário
         User user = User.builder()
                 .nome(registerRequest.getNome())
                 .email(registerRequest.getEmail())
@@ -56,8 +58,10 @@ public class AuthService {
 
         user = userRepository.save(user);
 
+        // Gerar token JWT
         String jwt = jwtUtils.generateTokenFromUsername(user.getEmail());
-
+        
+        // Retornar resposta com token e informações do usuário
         return AuthDTO.AuthResponse.builder()
                 .token(jwt)
                 .type("Bearer")
@@ -68,6 +72,7 @@ public class AuthService {
                 .build();
     }
 
+    // Método para login de usuário
     public AuthDTO.AuthResponse login(AuthDTO.LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -75,12 +80,14 @@ public class AuthService {
                         loginRequest.getPassword()
                 )
         );
-
+        // Se a autenticação for bem-sucedida, o contexto de segurança é atualizado
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtUtils.generateToken(authentication);
 
+        // Obter detalhes do usuário autenticado
         User user = (User) authentication.getPrincipal();
 
+        // Retornar resposta com token e informações do usuário
         return AuthDTO.AuthResponse.builder()
                 .token(jwt)
                 .type("Bearer")
@@ -89,6 +96,11 @@ public class AuthService {
                 .nome(user.getNome())
                 .roles(user.getRoles())
                 .build();
+    }
+
+
+    public List<User> findAll(){
+        return userRepository.findAll();
     }
 }
 

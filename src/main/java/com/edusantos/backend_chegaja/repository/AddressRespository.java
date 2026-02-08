@@ -7,11 +7,13 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
-public interface AddressRespository extends JpaRepository<Address, Long> {
-    List<Address> findByUserId(Long userId);
+public interface AddressRespository extends JpaRepository<Address, UUID> {
+    // Método para encontrar endereços por ID do usuário
+    List<Address> findByUserId(UUID userId);
 
-    Optional<Address> findByUserIdAndPrincipal(Long userId, Boolean principal);
+    Optional<Address> findByUserIdAndPrincipal(UUID userId, Boolean principal);
     // Desmarcar endereço principal (caso vá salvar outro como principal)
     @Modifying
     @Query("""
@@ -19,5 +21,5 @@ public interface AddressRespository extends JpaRepository<Address, Long> {
         SET a.principal = false
         WHERE a.user.id = :userId
     """)
-    void desmarcarEnderecosPrincipais(Long userId);
+    void desmarcarEnderecosPrincipais(UUID userId);
 }

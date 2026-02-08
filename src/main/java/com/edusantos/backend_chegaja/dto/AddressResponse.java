@@ -1,10 +1,11 @@
 package com.edusantos.backend_chegaja.dto;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 public record AddressResponse(
-        Long id,
-        Long userId,
+        UUID id,
+        UUID userId,
         String endereco,
         String complemento,
         String bairro,

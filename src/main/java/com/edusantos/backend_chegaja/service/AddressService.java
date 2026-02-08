@@ -7,11 +7,11 @@ import com.edusantos.backend_chegaja.exception.ResourceNotFoundException;
 import com.edusantos.backend_chegaja.repository.AddressRespository;
 import com.edusantos.backend_chegaja.repository.UserRepository;
 import org.springframework.transaction.annotation.Transactional;
-import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class AddressService {
@@ -24,9 +24,10 @@ public class AddressService {
         this.addressRespository = addressRespository;
     }
 
+    // Criar endereço para o usuário
     @Transactional
-    public Address create(Long userId, Address address){
-        User user = userRepository.findById(userId)
+    public Address create(UUID userId, Address address){
+        User user = (User) userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
 
         address.setUser(user);
@@ -39,16 +40,19 @@ public class AddressService {
         return addressRespository.save(address);
     }
 
-    public List<Address> listByUser(Long userId){
+    // Listar endereços do usuário
+    public List<Address> listByUser(UUID userId){
         return addressRespository.findByUserId(userId);
     }
 
-    public Optional<Address> getPrincipal(Long userId){
+    // Buscar endereço principal
+    public Optional<Address> getPrincipal(UUID userId){
         return addressRespository.findByUserIdAndPrincipal(userId, true);
     }
 
+    // Deletar endereço
     @Transactional
-    public void delete(Long userId, Long addressId){
+    public void delete(UUID userId, UUID addressId){
         Address address = addressRespository.findById(addressId)
                 .filter(a -> a.getUser().getId().equals(userId))
                 .orElseThrow(() -> new ResourceNotFoundException("Endereço não encontrado"));
@@ -56,6 +60,7 @@ public class AddressService {
         addressRespository.delete(address);
     }
 
+    // Converter entidade para DTO
     public AddressResponse toResponse(Address address) {
         return new AddressResponse(
                 address.getId(),

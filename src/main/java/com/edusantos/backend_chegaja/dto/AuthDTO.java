@@ -8,6 +8,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 public class AuthDTO {
 
     @Data
@@ -49,8 +51,8 @@ public class AuthDTO {
     public static class AuthResponse {
         private String token;
         private String type = "Bearer";
-        private Long id;
-        private String email;
+        private UUID id;
+        private String email; //
         private String nome;
         private java.util.Set<String> roles;
     }

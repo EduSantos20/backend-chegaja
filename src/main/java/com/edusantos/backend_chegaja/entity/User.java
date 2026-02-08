@@ -25,8 +25,8 @@ import java.util.stream.Collectors;
 public class User implements UserDetails {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @Column(nullable = false, unique = true)
     private String email;
@@ -72,7 +72,7 @@ public class User implements UserDetails {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
         if (roles.isEmpty()) {
-            roles.add("ROLE_ADMIN");
+            roles.add("ROLE_USER");
         }
     }
 
